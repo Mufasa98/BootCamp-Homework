@@ -1,0 +1,117 @@
+Sub LoopThruSheets()
+    Dim xSh As Worksheet
+    Application.ScreenUpdating = False
+    For Each xSh In Worksheets
+        xSh.Select
+        Call RunCode
+    Next
+    Application.ScreenUpdating = True
+End Sub
+Sub RunCode()
+
+    Dim lastrow, i, Printer As Long
+    Dim StockName, Checker As String
+    Dim Volume As Double
+    Dim MaxPercent, MinPercent, MaxVolume As Long
+    Dim MaxTicker, MinTicker, MaxVolTicker As String
+    
+    Printer = 2
+    Volume = 0
+    lastrow = Cells(Rows.Count, 1).End(xlUp).Row
+    
+    Range("I1").Value = "Ticker"
+    Range("J1").Value = "Open"
+    Range("K1").Value = "Close"
+    Range("L1").Value = "Change"
+    Range("M1").Value = "Percent Change"
+    Range("N1").Value = "Total Volume"
+    
+        For i = 2 To lastrow
+            StockName = Cells(i, 1).Value 'To get open, close and name
+                If Cells(i - 1, 1).Value <> StockName Then 'To get open, close and name
+                    Range("I" & Printer).Value = StockName 'To get open, close and name
+                    Range("J" & Printer).Value = Cells(i, 3).Value 'To get open, close and name
+                    Volume = Cells(i, 7) 'To get volume
+                    
+                ElseIf Cells(i + 1, 1) <> StockName Then
+                    Range("K" & Printer).Value = Cells(i, 6).Value 'To Print open, close and name
+                    Range("N" & Printer).Value = Volume 'To Print open, close and name
+                    Printer = Printer + 1 'To Print open, close and name
+                    Volume = 0 'To get volume
+                    
+                Else: Volume = Volume + Cells(i, 7).Value
+                
+                End If
+        Next i
+        
+    'Calculating the change
+    Dim j As Integer
+    Dim lastrow1 As Long
+    
+    lastrow1 = Cells(Rows.Count, 9).End(xlUp).Row
+    
+        For j = 2 To lastrow1 'Calculating the change
+            Cells(j, 12) = Cells(j, 10) - Cells(j, 11) 'Calculating the change
+            
+                If Cells(j, 10) <> 0 Then 'Calculating the change
+                    Cells(j, 13) = Cells(j, 12) / Cells(j, 10) 'Calculating the change
+                    Cells(j, 13).Value = FormatPercent(Cells(j, 13)) 'Calculating the change & Percent
+                    
+                    
+                End If
+                
+                If Cells(j, 13).Value < 0 Then
+                    Range("M" & j).Interior.ColorIndex = 3 'Coloring percent boxes
+                Else
+                    Range("M" & j).Interior.ColorIndex = 4 'Coloring percent boxes
+                End If
+          
+        Next j
+        
+    'Bonus
+    
+    Range("P2").Value = "Greatest % Increase"
+    Range("P3").Value = "Greatest % Decrease"
+    Range("P4").Value = "Greatest Total Volume"
+    Range("Q1").Value = "Ticker"
+    Range("R1").Value = "Value"
+    
+    Cells(2, 18).Value = Cells(2, 13).Value 'Max
+    Cells(3, 18).Value = Cells(2, 13).Value 'Min
+    Cells(4, 18).Value = Cells(2, 14).Value 'Volume
+    
+    
+     For j = 2 To lastrow1
+        
+            MaxPercent = Cells(2, 18).Value
+            MinPercent = Cells(3, 18).Value
+            MaxVolume = Cells(4, 18).Value
+            
+                If Cells(j, 13).Value > MaxPercent Then
+                    MaxPercent = Cells(j, 13).Value
+                    MaxTicker = Cells(j, 9).Value
+                    Cells(2, 17).Value = MaxTicker
+                    Cells(2, 18).Value = MaxPercent
+                    
+                
+                
+                ElseIf Cells(j, 13).Value < MinPercent Then
+                    MinPercent = Cells(j, 13).Value
+                    MinTicker = Cells(j, 9).Value
+                    Cells(3, 17).Value = MinTicker
+                    Cells(3, 18).Value = MinPercent
+                
+                End If
+                
+                'If Cells(j, 14).Value > MaxVolume Then
+                 '   MaxVolume = Cells(j, 14).Value
+                  '  Cells(4, 18).Value = MaxVolume
+                    
+                End If
+                    
+                
+            
+            
+   Next j
+
+End Sub
